@@ -1,0 +1,53 @@
+variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:v0.0.1.0357
+stages:
+  - test
+  - publish
+  - deploy
+  
+teste-regressivo:
+  stage: test
+  before_script:
+    - whoami
+    - chmod 777 scripts/script-chromedriver
+    - ls -ltr scripts/script-chromedriver
+    - scripts/script-chromedriver
+  script:
+    - whoami
+    - /usr/bin/chromedriver -v
+    - git clone -b develop ''
+    - cd automation-backoffice
+    - mvn test
+  tags:
+    - docker
+  only: 
+    - master
+    - develop
+    - /release-.*$/
+  allow_failure: true
+
+docker-build-develop:
+  image: docker:git
+  stage: publish
+  script:
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN gitlab.''
+  - docker build -t $IMAGE_TAG .
+  - docker push $IMAGE_TAG
+  tags:
+    - docker
+  only:
+    - master
+    - develop
+    - /release-.*$/
+
+deploy-rancher-develop:
+  stage: deploy
+  image: cdrx/rancher-gitlab-deploy
+  script:
+    - upgrade --stack $RANCHER_STACK_NAME  --service $RANCHER_STACK_SERVICE  --new-image $IMAGE_TAG
+  tags:
+    - docker
+  only:
+    - master
+    - develop
+    - /release-.*$/

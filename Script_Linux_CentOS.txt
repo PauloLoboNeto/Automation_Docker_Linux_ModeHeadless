@@ -1,0 +1,15 @@
+1- instalar o chrome: yum install google-chrome-stable
+2 - yum update -qqy
+3 - sed -i 's/"$HERE\/chrome"/"$HERE\/chrome" --no-sandbox/g' /opt/google/chrome/google-chrome
+
+
+    # ChromeDriver
+    wget --no-verbose -O /tmp/chromedriver_linux64.zip https://chromedriver.storage.googleapis.com/2.37/chromedriver_linux64.zip \
+    && rm -rf /opt/chromedriver \
+    && unzip /tmp/chromedriver_linux64.zip -d /opt \
+    && rm /tmp/chromedriver_linux64.zip \
+    && mv /opt/chromedriver /opt/chromedriver-2.37 \
+    && chmod 755 /opt/chromedriver-2.37 \
+    && ln -fs /opt/chromedriver-2.37 /usr/bin/chromedriver
+
+4 - yum install xvfb
